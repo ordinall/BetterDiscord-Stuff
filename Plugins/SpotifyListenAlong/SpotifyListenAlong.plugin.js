@@ -73,10 +73,10 @@ module.exports = (_ => {
 
 				start() {
 					const { ActionTypes: { SPOTIFY_PROFILE_UPDATE: type } } = DiscordModules.DiscordConstants
-					Patcher.instead(DiscordModules.DeviceStore, 'getProfile', (e,t) =>
+					Patcher.instead(DiscordModules.DeviceStore, 'getProfile', ( _, [id, t] ) =>
 						DiscordModules.Dispatcher.dispatch({
 							type,
-							accountId: e,
+							accountId: id,
 							isPremium: true
 						})
 					)
