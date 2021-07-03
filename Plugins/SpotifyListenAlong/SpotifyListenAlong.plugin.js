@@ -65,7 +65,7 @@ module.exports = (_ => {
 		stop() {}
 	} : (([Plugin, Api]) => {
 		const plugin = (Plugin, Library) => {
-			const { DiscordModules, Patcher } = Library;
+			const { DiscordModules, Patcher, WebpackModules } = Library;
 			return class SpotifyListenAlong extends Plugin {
 				constructor() {
 					super();
@@ -80,7 +80,7 @@ module.exports = (_ => {
 							isPremium: true
 						})
 					)
-					Patcher.instead(BdApi.findModuleByProps('isSpotifyPremium'), 'isSpotifyPremium', () => true)
+					Patcher.instead(WebpackModules.getByProps("isSpotifyPremium"), 'isSpotifyPremium', () => true)
 				}
 
 				stop() {
