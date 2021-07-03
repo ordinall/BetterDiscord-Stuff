@@ -2,7 +2,7 @@
  * @name SpotifyListenAlong
  * @author ordinall
  * @authorId 374663636347650049
- * @version 1.0.0
+ * @version 1.0.1
  * @description Enables Spotify Listen Along feature on Discord without Premium
  * @source https://github.com/ordinall/BetterDiscord-Stuff/tree/master/Plugins/SpotifyListenAlong/
  * @updateUrl https://raw.githubusercontent.com/ordinall/BetterDiscord-Stuff/master/Plugins/SpotifyListenAlong/SpotifyListenAlong.plugin.js
