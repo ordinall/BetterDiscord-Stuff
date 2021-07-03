@@ -65,14 +65,14 @@ module.exports = (_ => {
 		stop() {}
 	} : (([Plugin, Api]) => {
 		const plugin = (Plugin, Library) => {
-			const { Patcher } = Library;
+			const { Patcher, WebpackModules } = Library;
 			return class DisableStickerSuggestions extends Plugin {
 				constructor() {
 					super();
 				}
 
 				start() {
-					Patcher.after(BdApi.findModuleByProps("queryStickers"), "queryStickers", (_, [a,b,c], result) => { 
+					Patcher.after(WebpackModules.getByProps("queryStickers"), "queryStickers", (_, [a,b,c], result) => { 
 						if ( !(c == undefined || c == null) ) {
 							return { stickers : [] };
 						} else {
