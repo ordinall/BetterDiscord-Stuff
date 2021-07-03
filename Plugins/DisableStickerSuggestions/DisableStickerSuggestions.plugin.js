@@ -47,11 +47,20 @@ module.exports = (_ => {
 		load() {
 			BdApi.showConfirmationModal(
 				"Library plugin is needed",
-				[`The library plugin needed for ${config.info.name} is missing. Please click Download to install it.`], {
+				[`The library plugin needed for ${config.info.name} is missing. Please click Download to install it.`], 
+				{
 					confirmText: "Download",
 					cancelText: "Cancel",
 					onConfirm: () => {
 						require("request").get("https://rauenzi.github.io/BDPluginLibrary/release/0PluginLibrary.plugin.js", async (error, response, body) => {
+							if (error) {
+								return BdApi.showConfirmationModal("Error Downloading",
+									[
+										"Library plugin download failed. Manually install plugin library from the link below.",
+										BdApi.React.createElement("a", { href: "https://rauenzi.github.io/BDPluginLibrary/release/0PluginLibrary.plugin.js", target: "_blank" }, "Plugin Link")
+									],
+								);
+							}
 							await new Promise(r => require("fs").writeFile(require("path").join(BdApi.Plugins.folder, "0PluginLibrary.plugin.js"), body, r));
 						});
 					}
