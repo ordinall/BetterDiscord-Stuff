@@ -17,17 +17,22 @@ module.exports = (_ => {
 				"discord_id": "374663636347650049",
 				"github_username": "ordinall",
 			}],
-			"version": "1.0.0",
+			"version": "1.0.1",
 			"description": "Disables sticker suggestions when typing emotes in the chat",
 			"github": "https://github.com/ordinall/BetterDiscord-Stuff/tree/master/Plugins/DisableStickerSuggestions/",
 			"github_raw": "https://raw.githubusercontent.com/ordinall/BetterDiscord-Stuff/master/Plugins/DisableStickerSuggestions/DisableStickerSuggestions.plugin.js"
 		},
 		"changelog": [
+            {
+                "title": "v1.0.1",
+				"items": [
+					"Fixed missing library modal"
+				]
+            },
 			{
 				"title": "Initial Release",
-				"type": "added",
 				"items": [
-					"This is the first release of the plugin :)"
+					"This is the initial release of the plugin :)"
 				]
 			}
 		],
@@ -40,26 +45,18 @@ module.exports = (_ => {
 		getDescription() {return config.info.description;}
 		getVersion() {return config.info.version;}
 		load() {
-			const title = "Library Missing";
-			const ModalStack = BdApi.findModuleByProps("push", "update", "pop", "popWithKey");
-			const TextElement = BdApi.findModuleByProps("Sizes", "Weights");
-			const ConfirmationModal = BdApi.findModule(m => m.defaultProps && m.key && m.key() == "confirm-modal");
-			if (!ModalStack || !ConfirmationModal || !TextElement) return BdApi.alert(title, `The library plugin needed for ${config.info.name} is missing.<br /><br /> <a href="https://betterdiscord.net/ghdl?url=https://raw.githubusercontent.com/rauenzi/BDPluginLibrary/master/release/0PluginLibrary.plugin.js" target="_blank">Click here to download the library!</a>`);
-			ModalStack.push(function(props) {
-				return BdApi.React.createElement(ConfirmationModal, Object.assign({
-					header: title,
-					children: [BdApi.React.createElement(TextElement, {color: TextElement.Colors.PRIMARY, children: [`The library plugin needed for ${config.info.name} is missing. Please click Download Now to install it.`]})],
-					red: false,
-					confirmText: "Download Now",
+			BdApi.showConfirmationModal(
+				"Library plugin is needed",
+				[`The library plugin needed for ${config.info.name} is missing. Please click Download to install it.`], {
+					confirmText: "Download",
 					cancelText: "Cancel",
 					onConfirm: () => {
 						require("request").get("https://rauenzi.github.io/BDPluginLibrary/release/0PluginLibrary.plugin.js", async (error, response, body) => {
-							if (error) return require("electron").shell.openExternal("https://betterdiscord.net/ghdl?url=https://raw.githubusercontent.com/rauenzi/BDPluginLibrary/master/release/0PluginLibrary.plugin.js");
-							await new Promise(r => require("fs").writeFile(require("path").join(ContentManager.pluginsFolder, "0PluginLibrary.plugin.js"), body, r));
+							await new Promise(r => require("fs").writeFile(require("path").join(BdApi.Plugins.folder, "0PluginLibrary.plugin.js"), body, r));
 						});
 					}
-				}, props));
-			});
+				}
+			);
 		}
 		start() {}
 		stop() {}
