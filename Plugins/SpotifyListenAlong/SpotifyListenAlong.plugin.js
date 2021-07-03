@@ -23,12 +23,12 @@ module.exports = (_ => {
 			"github_raw": "https://raw.githubusercontent.com/ordinall/BetterDiscord-Stuff/master/Plugins/SpotifyListenAlong/SpotifyListenAlong.plugin.js"
 		},
 		"changelog": [
-            {
-                "title": "v1.0.1",
+			{
+				"title": "v1.0.1",
 				"items": [
 					"Fixed missing library modal"
 				]
-            },
+			},
 			{
 				"title": "Initial Release",
 				"items": [
