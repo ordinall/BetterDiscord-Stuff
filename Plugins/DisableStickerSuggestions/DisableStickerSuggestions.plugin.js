@@ -2,7 +2,7 @@
  * @name DisableStickerSuggestions
  * @author ordinall
  * @authorId 374663636347650049
- * @version 1.0.1
+ * @version 1.0.2
  * @description Disables sticker suggestions when typing emotes in the chat
  * @source https://github.com/ordinall/BetterDiscord-Stuff/tree/master/Plugins/DisableStickerSuggestions/
  * @updateUrl https://raw.githubusercontent.com/ordinall/BetterDiscord-Stuff/master/Plugins/DisableStickerSuggestions/DisableStickerSuggestions.plugin.js
@@ -17,12 +17,18 @@ module.exports = (_ => {
 				"discord_id": "374663636347650049",
 				"github_username": "ordinall",
 			}],
-			"version": "1.0.1",
+			"version": "1.0.2",
 			"description": "Disables sticker suggestions when typing emotes in the chat",
 			"github": "https://github.com/ordinall/BetterDiscord-Stuff/tree/master/Plugins/DisableStickerSuggestions/",
 			"github_raw": "https://raw.githubusercontent.com/ordinall/BetterDiscord-Stuff/master/Plugins/DisableStickerSuggestions/DisableStickerSuggestions.plugin.js"
 		},
 		"changelog": [
+			{
+				"title": "v1.0.2",
+				"items": [
+					"Move sticker option downward under grammar options."
+				]
+			},
 			{
 				"title": "v1.0.1",
 				"items": [
@@ -84,7 +90,16 @@ module.exports = (_ => {
 						} else {
 							return result;
 						}
-					})
+					});
+					
+					//Move sticker option downward under grammar options
+					Patcher.after(WebpackModules.find(m => m?.default?.displayName === "SlateTextAreaContextMenu"), "default", (_, [a,b,c], result) => { 
+						//Move the option, `splice()` is in-place which is nice
+            					//Index where we want it     v  v     No deletion
+            					result.props.children.splice(2, 0,
+                					//Remove our first option and return it ([0])
+                					result.props.children.splice(0, 1)[0]);
+					});
 				}
 
 				stop() {
