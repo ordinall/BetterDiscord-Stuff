@@ -2,7 +2,7 @@
  * @name DisableStickerSuggestions
  * @author ordinall
  * @authorId 374663636347650049
- * @version 1.1.0
+ * @version 1.1.1
  * @description Disables sticker suggestions when typing emotes in the chat
  * @source https://github.com/ordinall/BetterDiscord-Stuff/tree/master/Plugins/DisableStickerSuggestions/
  * @updateUrl https://raw.githubusercontent.com/ordinall/BetterDiscord-Stuff/master/Plugins/DisableStickerSuggestions/DisableStickerSuggestions.plugin.js
@@ -17,12 +17,18 @@ module.exports = (_ => {
 				"discord_id": "374663636347650049",
 				"github_username": "ordinall",
 			}],
-			"version": "1.1.0",
+			"version": "1.1.1",
 			"description": "Disables sticker suggestions while typing messages and emotes in chat",
 			"github": "https://github.com/ordinall/BetterDiscord-Stuff/tree/master/Plugins/DisableStickerSuggestions/",
 			"github_raw": "https://raw.githubusercontent.com/ordinall/BetterDiscord-Stuff/master/Plugins/DisableStickerSuggestions/DisableStickerSuggestions.plugin.js"
 		},
 		"changelog": [
+			{
+				"title": "v1.1.1",
+				"items": [
+					"Fixed some text area still showing the sticker suggestions context menu entry (thanks again @Farcrada)"
+				]
+			},
 			{
 				"title": "v1.1.0",
 				"items": [
@@ -105,7 +111,10 @@ module.exports = (_ => {
 						Toasts.show("Change Sticker Suggestions setting in plugin's settings", { type: "info" });
 					});
 					Patcher.after(WebpackModules.find(m => m?.default?.displayName === "SlateTextAreaContextMenu"), "default", (_, [a,b,c], result) => { 
-            					result.props.children.splice(0, 1);
+						result.props.children.splice(0, 1);
+					});
+					Patcher.after(WebpackModules.find(m => m?.default?.displayName === "NativeTextAreaContextMenu"), "default", (_, [a,b,c], result) => { 
+						result.props.children.splice(0, 1);
 					});
 					this.applyPatches();
 				}
@@ -122,7 +131,7 @@ module.exports = (_ => {
 					}
 					const expressionModule = WebpackModules.getByProps("expressionSuggestionsEnabled");
 					if(this.settings.disableMessageSuggestions == expressionModule.expressionSuggestionsEnabled) {
-							this.toggleMessageStickerSuggestions();
+						this.toggleMessageStickerSuggestions();
 					}
 				}
 
