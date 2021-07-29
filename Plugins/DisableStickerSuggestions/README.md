@@ -1,2 +1,2 @@
 # DisableStickerSuggestions
-This plugin disables sticker suggestions when typing emotes in the chat.
+This plugin disables sticker suggestions while typing messages and emotes in chat
