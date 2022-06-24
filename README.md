@@ -1,2 +1,2 @@
 # BetterDiscord-Stuff
-BetterDiscord plugins I made.
+Collection of BetterDiscord plugins made by me.

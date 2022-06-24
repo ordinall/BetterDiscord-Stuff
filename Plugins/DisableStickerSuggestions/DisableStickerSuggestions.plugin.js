@@ -2,7 +2,7 @@
  * @name DisableStickerSuggestions
  * @author ordinall
  * @authorId 374663636347650049
- * @version 1.2.0
+ * @version 1.2.1
  * @description Disables sticker suggestions when typing emotes in the chat
  * @source https://github.com/ordinall/BetterDiscord-Stuff/tree/master/Plugins/DisableStickerSuggestions/
  * @updateUrl https://raw.githubusercontent.com/ordinall/BetterDiscord-Stuff/master/Plugins/DisableStickerSuggestions/DisableStickerSuggestions.plugin.js
@@ -17,12 +17,19 @@ module.exports = (_ => {
 				"discord_id": "374663636347650049",
 				"github_username": "ordinall",
 			}],
-			"version": "1.2.0",
+			"version": "1.2.1",
 			"description": "Disables sticker suggestions while typing messages and emotes in chat",
 			"github": "https://github.com/ordinall/BetterDiscord-Stuff/tree/master/Plugins/DisableStickerSuggestions/",
 			"github_raw": "https://raw.githubusercontent.com/ordinall/BetterDiscord-Stuff/master/Plugins/DisableStickerSuggestions/DisableStickerSuggestions.plugin.js"
 		},
 		"changelog": [
+			{
+				"title": "v1.2.1",
+				"items": [
+					"Fixed the crashing which was happening because discord made changes to internal sticker modules",
+					"There is a known bug right now, regarding plugin settings not persisting discord restarts, I will attempt to fix it in a few days"
+				]
+			},
 			{
 				"title": "v1.2.0",
 				"items": [
@@ -119,7 +126,11 @@ module.exports = (_ => {
 					Patcher.after(WebpackModules.find(m => m?.default?.displayName === "NativeTextAreaContextMenu"), "default", (_, [a,b,c], result) => { 
 						result.props.children.splice(0, 1);
 					});
-					this.expressionModule = WebpackModules.getByProps("expressionSuggestionsEnabled");
+					// Patcher.after(WebpackModules.getByProps("ExpressionSuggestionsEnabled").ExpressionSuggestionsEnabled, "updateSetting", (_, [a]) => {
+					// 	this.settings.disableMessageSuggestions = !a;
+					// 	this.saveSettings();
+					// });
+					this.expressionModule = WebpackModules.getByProps("ExpressionSuggestionsEnabled");
 					this.applyPatches();
 				}
 
@@ -127,17 +138,14 @@ module.exports = (_ => {
 					if (this.settings.disableEmojiSuggestions) {
 						this.removeEmojiPatch = Patcher.after(WebpackModules.getByProps("queryStickers"), "queryStickers", (_, [a,b,c], result) => { 
 							if ( !(c == undefined || c == null) ) {
-								return { stickers : [] };
+								return [];
 							} else {
 								return result;
 							}
 						});
 					}
-					if(this.settings.disableMessageSuggestions == this.expressionModule.expressionSuggestionsEnabled) {
-						let { ActionTypes: { EXPRESSION_SUGGESTIONS_TOGGLE: type } } =  DiscordModules.DiscordConstants;
-						DiscordModules.Dispatcher.dispatch({
-							type
-						});
+					if(this.settings.disableMessageSuggestions == this.expressionModule.ExpressionSuggestionsEnabled.getSetting()) {
+						this.expressionModule.ExpressionSuggestionsEnabled.updateSetting(!this.expressionModule.ExpressionSuggestionsEnabled.getSetting());
 					}
 				}
 
@@ -146,7 +154,7 @@ module.exports = (_ => {
 				}
 
 				getSettingsPanel() {
-					this.settings.disableMessageSuggestions = !this.expressionModule.expressionSuggestionsEnabled;
+					this.settings.disableMessageSuggestions = !this.expressionModule.ExpressionSuggestionsEnabled.getSetting();
 					const panel = this.buildSettingsPanel();
 					panel.addListener(() => {
 						this.removePatches();
