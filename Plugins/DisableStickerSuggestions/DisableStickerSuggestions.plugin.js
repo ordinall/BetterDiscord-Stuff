@@ -148,7 +148,7 @@ module.exports = (_ => {
 						this.expressionModule.ExpressionSuggestionsEnabled.updateSetting(!this.expressionModule.ExpressionSuggestionsEnabled.getSetting());
 					}
 				}
-
+ 
 				removePatches() {
 					this.removeEmojiPatch();
 				}
