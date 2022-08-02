@@ -2,7 +2,7 @@
  * @name SpotifyListenAlong
  * @author ordinall
  * @authorId 374663636347650049
- * @version 1.0.1
+ * @version 1.0.2
  * @description Enables Spotify Listen Along feature on Discord without Premium
  * @source https://github.com/ordinall/BetterDiscord-Stuff/tree/master/Plugins/SpotifyListenAlong/
  * @updateUrl https://raw.githubusercontent.com/ordinall/BetterDiscord-Stuff/master/Plugins/SpotifyListenAlong/SpotifyListenAlong.plugin.js
@@ -17,12 +17,18 @@ module.exports = (_ => {
 				"discord_id": "374663636347650049",
 				"github_username": "ordinall",
 			}],
-			"version": "1.0.1",
+			"version": "1.0.2",
 			"description": "Enables Spotify Listen Along feature on Discord without Premium",
 			"github": "https://github.com/ordinall/BetterDiscord-Stuff/tree/master/Plugins/SpotifyListenAlong/",
 			"github_raw": "https://raw.githubusercontent.com/ordinall/BetterDiscord-Stuff/master/Plugins/SpotifyListenAlong/SpotifyListenAlong.plugin.js"
 		},
 		"changelog": [
+			{
+				"title": "v1.0.2",
+				"items": [
+					"Fixed a bug introduced by missing ActionTypes in a recent discord update (Thanks @Qwerasd and @Gam3rr)"
+				]
+			},
 			{
 				"title": "v1.0.1",
 				"items": [
@@ -78,10 +84,9 @@ module.exports = (_ => {
 				}
 
 				start() {
-					const { ActionTypes: { SPOTIFY_PROFILE_UPDATE: type } } = DiscordModules.DiscordConstants
 					Patcher.instead(DiscordModules.DeviceStore, 'getProfile', ( _, [id, t] ) =>
 						DiscordModules.Dispatcher.dispatch({
-							type,
+							type: "SPOTIFY_PROFILE_UPDATE",
 							accountId: id,
 							isPremium: true
 						})
