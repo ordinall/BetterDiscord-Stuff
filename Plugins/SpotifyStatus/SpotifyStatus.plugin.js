@@ -61,7 +61,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
         }
 
         onStart() {
-            Patcher.after(WebpackModules.getByIndex(663953), "default", (_, [activities, t], res) => {
+            Patcher.after(WebpackModules.find(m => m?.default?.toString().match(/;null!=(.*)&&\((.*)=\[\]\.concat\(function(.*)isArray\((.*)\)\)(.*);return"Map"===(.*)\|\|(.*)(.*)\|\|\/\^\(\?:Ui\|I\)nt\(\?:8(.*)\n(.*)\.map(.*)}\)\)\.find/)), "default", (_, [activities, t], res) => {
                 if (Array.isArray(res) && res.length == 2 && res[0] == "Listening to ") {
                     for (const activity of activities) {
                         if (activity.type == 2) {
