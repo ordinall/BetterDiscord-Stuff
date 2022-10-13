@@ -1,7 +1,7 @@
 /**
  * @name SpotifyListenAlong
  * @description Enables Spotify Listen Along feature on Discord without Premium
- * @version 1.0.2
+ * @version 1.0.3
  * @author ordinall
  * @authorId 374663636347650049
  * @website https://github.com/ordinall/BetterDiscord-Stuff/tree/master/Plugins/SpotifyListenAlong/
@@ -30,7 +30,7 @@
     WScript.Quit();
 
 @else@*/
-const config = {"info":{"name":"SpotifyListenAlong","authors":[{"name":"ordinall","discord_id":"374663636347650049","github_username":"ordinall"}],"version":"1.0.2","description":"Enables Spotify Listen Along feature on Discord without Premium","github":"https://github.com/ordinall/BetterDiscord-Stuff/tree/master/Plugins/SpotifyListenAlong/","github_raw":"https://raw.githubusercontent.com/ordinall/BetterDiscord-Stuff/master/Plugins/SpotifyListenAlong/SpotifyListenAlong.plugin.js"},"changelog":[{"title":"v1.0.2","items":["Fixed a bug introduced by missing ActionTypes in a recent discord update (Thanks @Qwerasd and @Gam3rr)"]},{"title":"v1.0.1","items":["Fixed missing library modal"]},{"title":"Initial Release","items":["This is the initial release of the plugin :)"]}],"main":"index.js"};
+const config = {"info":{"name":"SpotifyListenAlong","authors":[{"name":"ordinall","discord_id":"374663636347650049","github_username":"ordinall"}],"version":"1.0.3","description":"Enables Spotify Listen Along feature on Discord without Premium","github":"https://github.com/ordinall/BetterDiscord-Stuff/tree/master/Plugins/SpotifyListenAlong/","github_raw":"https://raw.githubusercontent.com/ordinall/BetterDiscord-Stuff/master/Plugins/SpotifyListenAlong/SpotifyListenAlong.plugin.js"},"changelog":[{"title":"v1.0.3","items":["Support the latest Discord major update"]},{"title":"v1.0.2","items":["Fixed a bug introduced by missing ActionTypes in a recent discord update (Thanks @Qwerasd and @Gam3rr)"]},{"title":"v1.0.1","items":["Fixed missing library modal"]},{"title":"Initial Release","items":["This is the initial release of the plugin :)"]}],"main":"index.js"};
 class Dummy {
     constructor() {this._config = config;}
     start() {}
@@ -61,18 +61,21 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
         }
 
         onStart() {
-            Patcher.instead(DiscordModules.DeviceStore, 'getProfile', (_, [id, t]) =>
-                DiscordModules.Dispatcher.dispatch({
-                    type: "SPOTIFY_PROFILE_UPDATE",
-                    accountId: id,
-                    isPremium: true
-                })
-            )
-            Patcher.instead(WebpackModules.getByProps("isSpotifyPremium"), 'isSpotifyPremium', () => true)
+            const getActiveSocketAndDevice = WebpackModules.getByProps( 'getActiveSocketAndDevice' );   
+            if ( getActiveSocketAndDevice?.getActiveSocketAndDevice ) {
+                BdApi.Patcher.after(
+                    'SpotifyListenAlong',
+                    getActiveSocketAndDevice, 'getActiveSocketAndDevice',
+                    ( that, args, ret ) => {
+                        if ( ret?.socket ) ret.socket.isPremium = true;
+                        return ret;
+                    }
+                );
+            }
         }
 
         onStop() {
-            Patcher.unpatchAll()
+            BdApi.Patcher.unpatchAll( 'SpotifyListenAlong' );
         }
     };
 
