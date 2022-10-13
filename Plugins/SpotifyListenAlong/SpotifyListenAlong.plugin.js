@@ -1,7 +1,7 @@
 /**
  * @name SpotifyListenAlong
  * @description Enables Spotify Listen Along feature on Discord without Premium
- * @version 1.0.3
+ * @version 1.1.0
  * @author ordinall
  * @authorId 374663636347650049
  * @website https://github.com/ordinall/BetterDiscord-Stuff/tree/master/Plugins/SpotifyListenAlong/
@@ -30,7 +30,7 @@
     WScript.Quit();
 
 @else@*/
-const config = {"info":{"name":"SpotifyListenAlong","authors":[{"name":"ordinall","discord_id":"374663636347650049","github_username":"ordinall"}],"version":"1.0.3","description":"Enables Spotify Listen Along feature on Discord without Premium","github":"https://github.com/ordinall/BetterDiscord-Stuff/tree/master/Plugins/SpotifyListenAlong/","github_raw":"https://raw.githubusercontent.com/ordinall/BetterDiscord-Stuff/master/Plugins/SpotifyListenAlong/SpotifyListenAlong.plugin.js"},"changelog":[{"title":"v1.0.3","items":["Support the latest Discord major update"]},{"title":"v1.0.2","items":["Fixed a bug introduced by missing ActionTypes in a recent discord update (Thanks @Qwerasd and @Gam3rr)"]},{"title":"v1.0.1","items":["Fixed missing library modal"]},{"title":"Initial Release","items":["This is the initial release of the plugin :)"]}],"main":"index.js"};
+const config = {"info":{"name":"SpotifyListenAlong","authors":[{"name":"ordinall","discord_id":"374663636347650049","github_username":"ordinall"}],"version":"1.1.0","description":"Enables Spotify Listen Along feature on Discord without Premium","github":"https://github.com/ordinall/BetterDiscord-Stuff/tree/master/Plugins/SpotifyListenAlong/","github_raw":"https://raw.githubusercontent.com/ordinall/BetterDiscord-Stuff/master/Plugins/SpotifyListenAlong/SpotifyListenAlong.plugin.js"},"changelog":[{"title":"v1.1.0","items":["Fixed for the major discord electron update (thanks @d0gkiller87)"]}],"main":"index.js"};
 class Dummy {
     constructor() {this._config = config;}
     start() {}
@@ -53,7 +53,7 @@ if (!global.ZeresPluginLibrary) {
 module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
      const plugin = (Plugin, Library) => {
 
-    const { DiscordModules, Patcher, WebpackModules } = Library;
+    const { Patcher, WebpackModules } = Library;
 
     return class SpotifyListenAlong extends Plugin {
         constructor() {
@@ -61,12 +61,12 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
         }
 
         onStart() {
-            const getActiveSocketAndDevice = WebpackModules.getByProps( 'getActiveSocketAndDevice' );   
-            if ( getActiveSocketAndDevice?.getActiveSocketAndDevice ) {
-                BdApi.Patcher.after(
-                    'SpotifyListenAlong',
-                    getActiveSocketAndDevice, 'getActiveSocketAndDevice',
-                    ( that, args, ret ) => {
+            const DeviceStore = WebpackModules.getByProps('getActiveSocketAndDevice');   
+            if (DeviceStore?.getActiveSocketAndDevice) {
+                Patcher.after(
+                    DeviceStore,
+                    'getActiveSocketAndDevice',
+                    (_, args, ret) => {
                         if ( ret?.socket ) ret.socket.isPremium = true;
                         return ret;
                     }
@@ -75,7 +75,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
         }
 
         onStop() {
-            BdApi.Patcher.unpatchAll( 'SpotifyListenAlong' );
+            Patcher.unpatchAll()
         }
     };
 
