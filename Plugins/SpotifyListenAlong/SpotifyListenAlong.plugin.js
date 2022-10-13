@@ -64,7 +64,8 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
             const getActiveSocketAndDevice = WebpackModules.getByProps( 'getActiveSocketAndDevice' );   
             if ( getActiveSocketAndDevice?.getActiveSocketAndDevice ) {
                 BdApi.Patcher.after(
-                    '', getActiveSocketAndDevice, 'getActiveSocketAndDevice',
+                    'SpotifyListenAlong',
+                    getActiveSocketAndDevice, 'getActiveSocketAndDevice',
                     ( that, args, ret ) => {
                         if ( ret?.socket ) ret.socket.isPremium = true;
                         return ret;
@@ -74,7 +75,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
         }
 
         onStop() {
-            Patcher.unpatchAll()
+            BdApi.Patcher.unpatchAll( 'SpotifyListenAlong' );
         }
     };
 
