@@ -1,7 +1,7 @@
 /**
  * @name SpotifyStatus
  * @description Shows the song name in status as "Listening to xxxx" instead of default "Listening to Spotify"
- * @version 1.0.1
+ * @version 1.0.2
  * @author ordinall
  * @authorId 374663636347650049
  * @website https://github.com/ordinall/BetterDiscord-Stuff/tree/master/Plugins/SpotifyStatus/
@@ -30,7 +30,7 @@
     WScript.Quit();
 
 @else@*/
-const config = {"info":{"name":"SpotifyStatus","authors":[{"name":"ordinall","discord_id":"374663636347650049","github_username":"ordinall"}],"version":"1.0.1","description":"Shows the song name in status as \"Listening to xxxx\" instead of default \"Listening to Spotify\"","github":"https://github.com/ordinall/BetterDiscord-Stuff/tree/master/Plugins/SpotifyStatus/","github_raw":"https://raw.githubusercontent.com/ordinall/BetterDiscord-Stuff/master/Plugins/SpotifyStatus/SpotifyStatus.plugin.js"},"main":"index.js"};
+const config = {"info":{"name":"SpotifyStatus","authors":[{"name":"ordinall","discord_id":"374663636347650049","github_username":"ordinall"}],"version":"1.0.2","description":"Shows the song name in status as \"Listening to xxxx\" instead of default \"Listening to Spotify\"","github":"https://github.com/ordinall/BetterDiscord-Stuff/tree/master/Plugins/SpotifyStatus/","github_raw":"https://raw.githubusercontent.com/ordinall/BetterDiscord-Stuff/master/Plugins/SpotifyStatus/SpotifyStatus.plugin.js"},"main":"index.js"};
 class Dummy {
     constructor() {this._config = config;}
     start() {}
@@ -61,16 +61,20 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
         }
 
         onStart() {
-            Patcher.after(WebpackModules.find(m => m?.default?.toString().match(/\[\]\.concat(.*)Clamped(.*)method(.*)\.map(.*)\.find/s)), "default", (_, [activities, t], res) => {
-                if (Array.isArray(res) && res.length == 2 && res[0] == "Listening to ") {
-                    for (const activity of activities) {
-                        if (activity.type == 2) {
-                            res[1].props.children[0] = activity.details;
-                            return res;
+            Patcher.after(
+                WebpackModules.find(m => m.toString().includes("concat([null])"), {defaultExport: false}),
+                "Z",
+                (_, [activities, t], res) => {
+                    if (Array.isArray(res) && res.length == 2 && res[0] == "Listening to ") {
+                        for (const activity of activities) {
+                            if (activity.type == 2) {
+                                res[1].props.children[0] = activity.details;
+                                return res;
+                            }
                         }
                     }
                 }
-            });
+            );
         }
 
         onStop() {
