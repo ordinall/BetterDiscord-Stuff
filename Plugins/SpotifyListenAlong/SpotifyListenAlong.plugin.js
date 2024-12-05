@@ -1,7 +1,7 @@
 /**
  * @name SpotifyListenAlong
  * @description Enables Spotify Listen Along feature on Discord without Premium
- * @version 1.1.0
+ * @version 1.1.1
  * @author ordinall
  * @authorId 374663636347650049
  * @website https://github.com/ordinall/BetterDiscord-Stuff/tree/master/Plugins/SpotifyListenAlong/
@@ -30,7 +30,31 @@
     WScript.Quit();
 
 @else@*/
-const config = {"info":{"name":"SpotifyListenAlong","authors":[{"name":"ordinall","discord_id":"374663636347650049","github_username":"ordinall"}],"version":"1.1.0","description":"Enables Spotify Listen Along feature on Discord without Premium","github":"https://github.com/ordinall/BetterDiscord-Stuff/tree/master/Plugins/SpotifyListenAlong/","github_raw":"https://raw.githubusercontent.com/ordinall/BetterDiscord-Stuff/master/Plugins/SpotifyListenAlong/SpotifyListenAlong.plugin.js"},"changelog":[{"title":"v1.1.0","items":["Fixed for the major discord electron update (thanks @d0gkiller87)"]}],"main":"index.js"};
+const config = {
+    info: {
+        name: "SpotifyListenAlong",
+        authors: [
+            {
+                name: "ordinall",
+                discord_id: "374663636347650049",
+                github_username: "ordinall"
+            }
+        ],
+        version: "1.1.1",
+        description: "Enables Spotify Listen Along feature on Discord without Premium",
+        github: "https://github.com/ordinall/BetterDiscord-Stuff/tree/master/Plugins/SpotifyListenAlong/",
+        github_raw: "https://raw.githubusercontent.com/ordinall/BetterDiscord-Stuff/master/Plugins/SpotifyListenAlong/SpotifyListenAlong.plugin.js"
+    },
+    changelog: [
+        {
+            title: "v1.1.1",
+            items: [
+                "Built plugin using updated BDPluginLibrary (thanks @Pdada1)"
+            ]
+        }
+    ],
+    main: "index.js"
+};
 class Dummy {
     constructor() {this._config = config;}
     start() {}
@@ -38,13 +62,21 @@ class Dummy {
 }
  
 if (!global.ZeresPluginLibrary) {
-    BdApi.showConfirmationModal("Library Missing", `The library plugin needed for ${config.info.name} is missing. Please click Download Now to install it.`, {
+    BdApi.showConfirmationModal("Library Missing", `The library plugin needed for ${config.name ?? config.info.name} is missing. Please click Download Now to install it.`, {
         confirmText: "Download Now",
         cancelText: "Cancel",
         onConfirm: () => {
-            require("request").get("https://rauenzi.github.io/BDPluginLibrary/release/0PluginLibrary.plugin.js", async (error, response, body) => {
-                if (error) return require("electron").shell.openExternal("https://betterdiscord.app/Download?id=9");
-                await new Promise(r => require("fs").writeFile(require("path").join(BdApi.Plugins.folder, "0PluginLibrary.plugin.js"), body, r));
+            require("request").get("https://betterdiscord.app/gh-redirect?id=9", async (err, resp, body) => {
+                if (err) return require("electron").shell.openExternal("https://betterdiscord.app/Download?id=9");
+                if (resp.statusCode === 302) {
+                    require("request").get(resp.headers.location, async (error, response, content) => {
+                        if (error) return require("electron").shell.openExternal("https://betterdiscord.app/Download?id=9");
+                        await new Promise(r => require("fs").writeFile(require("path").join(BdApi.Plugins.folder, "0PluginLibrary.plugin.js"), content, r));
+                    });
+                }
+                else {
+                    await new Promise(r => require("fs").writeFile(require("path").join(BdApi.Plugins.folder, "0PluginLibrary.plugin.js"), body, r));
+                }
             });
         }
     });
